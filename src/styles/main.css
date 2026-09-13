@@ -599,6 +599,13 @@ main { position: relative; z-index: 10; }
   height: auto;
 }
 
+/* Option B keeps the whole frame — no cutout — and takes the site's
+   tonal-negative instead, so paper becomes ground and graphite becomes light,
+   exactly as the film is treated in the shader. */
+.option__img--negative {
+  filter: invert(1) contrast(1.14) brightness(0.94);
+}
+
 .option figcaption {
   margin-top: clamp(1.5rem, 3vh, 2.25rem);
   color: var(--mute);
