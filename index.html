@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Carousel — A Study in Return</title>
+<meta name="description" content="A graphite carousel, drawn on paper and inverted into light. Five acts, one uninterrupted scroll." />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+<link rel="preload" as="fetch" href="/carousel.mp4" type="video/mp4" crossorigin />
+</head>
+<body>
+
+<!-- Preloader ------------------------------------------------------------ -->
+<div class="preloader" id="preloader" role="status" aria-live="polite">
+  <div class="preloader__inner">
+    <p class="preloader__label mono">Carousel</p>
+    <div class="preloader__bar"><span class="preloader__fill" id="preloader-fill"></span></div>
+    <p class="preloader__pct mono" id="preloader-pct">00</p>
+  </div>
+</div>
+
+<!-- WebGL canvas --------------------------------------------------------- -->
+<div class="stage" id="stage" aria-hidden="true">
+  <canvas id="gl"></canvas>
+  <div class="stage__grain" aria-hidden="true"></div>
+</div>
+
+<!-- Accessible description of the visual --------------------------------- -->
+<p class="visually-hidden" id="media-desc">
+  A hand-drawn graphite carousel — canopy, cresting, five horses and a winged horse — turning slowly
+  on white paper, rendered here inverted, as light on black.
+</p>
+
+<a class="skip-link" href="#act-4">Skip to the text</a>
+
+<header class="chrome chrome--top">
+  <nav class="chrome__row" aria-label="Primary">
+    <a class="wordmark" href="#act-1">Carousel</a>
+    <ul class="chrome__meta mono">
+      <li>No.&nbsp;01</li>
+      <li aria-hidden="true">—</li>
+      <li>Graphite on paper</li>
+    </ul>
+    <div class="controls">
+      <button class="toggle mono" id="motion-toggle" type="button" aria-pressed="false">
+        <span class="toggle__dot" aria-hidden="true"></span>
+        <span id="motion-toggle-label">Pause</span>
+      </button>
+      <button class="toggle mono" id="sound-toggle" type="button" aria-pressed="true">
+        <span class="toggle__dot" aria-hidden="true"></span>
+        <span id="sound-toggle-label">Sound</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- I ——————————————————————————————————————————— COLD OPEN -->
+  <section class="act act--1" id="act-1" data-act="1" aria-labelledby="headline">
+    <div class="act__pin">
+      <div class="act__grid">
+        <p class="act__index mono" data-fade>I / Cold open</p>
+        <h1 class="display plate" id="headline">
+          <span class="line"><span class="line__in">Nothing here</span></span>
+          <span class="line"><span class="line__in">moves forward.</span></span>
+          <span class="line"><span class="line__in">Everything</span></span>
+          <span class="line"><span class="line__in">returns.</span></span>
+        </h1>
+        <p class="act__lede" data-fade>
+          Ten seconds of graphite, looped without a seam.
+        </p>
+      </div>
+      <div class="scroll-cue mono" id="scroll-cue" aria-hidden="true">
+        <span>Scroll</span><i class="scroll-cue__rule"></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- II —————————————————————————————————————————— THE REVEAL -->
+  <section class="act act--2" id="act-2" data-act="2" aria-labelledby="act-2-title">
+    <div class="act__pin">
+      <p class="act__index act__index--float mono" data-fade>II / The reveal</p>
+      <h2 class="visually-hidden" id="act-2-title">The reveal</h2>
+      <dl class="specs mono">
+        <div class="specs__item plate specs__item--tl" data-spec>
+          <dt>Source</dt><dd>Graphite on paper</dd>
+        </div>
+        <div class="specs__item plate specs__item--tr" data-spec>
+          <dt>Frame</dt><dd>1280 × 720 · 24fps</dd>
+        </div>
+        <div class="specs__item plate specs__item--bl" data-spec>
+          <dt>Duration</dt><dd>00:10 · looped</dd>
+        </div>
+        <div class="specs__item plate specs__item--br" data-spec>
+          <dt>Treatment</dt><dd>Inverted · real-time</dd>
+        </div>
+      </dl>
+      <p class="act__caption plate" data-fade>
+        It arrives out of focus, the way a memory of a fairground does,
+        and then the paper gives up its detail.
+      </p>
+    </div>
+  </section>
+
+  <!-- III ————————————————————————————————————————— FRAGMENT -->
+  <section class="act act--3" id="act-3" data-act="3" aria-labelledby="act-3-title">
+    <div class="act__pin">
+      <p class="act__index act__index--float mono plate" data-fade>III / Fragment</p>
+      <div class="act__offset">
+        <h2 class="display display--md plate" id="act-3-title">
+          <span class="line"><span class="line__in">Hold it still</span></span>
+          <span class="line"><span class="line__in">and it is a drawing.</span></span>
+        </h2>
+        <p class="act__lede act__lede--wide plate" data-fade>
+          Move, and it comes apart into the tiles it was always made of — then finds
+          its way back, because that is the only thing a carousel knows how to do.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- IV —————————————————————————————————————————— FRAMED -->
+  <section class="act act--4" id="act-4" data-act="4" aria-labelledby="act-4-title">
+    <div class="act__pin">
+      <div class="split">
+        <div class="split__frame" aria-hidden="true"><span class="split__rule"></span></div>
+        <div class="split__copy">
+          <p class="act__index mono" data-fade>IV / Framed</p>
+          <h2 class="display display--sm" id="act-4-title" data-chars>A machine built to go nowhere</h2>
+          <div class="prose">
+            <p data-fade>
+              Every other machine of the nineteenth century was an argument about
+              distance. The carousel refused. Its entire engineering — the crown
+              gear, the cranked rods, the horses rising against their poles — is
+              devoted to bringing a rider back to the exact point they left.
+            </p>
+            <p data-fade>
+              The drawing understands this before we do. The artist never closes a
+              contour. Each horse is a set of open lines that agree, for a moment,
+              to be a horse, and then let go.
+            </p>
+          </div>
+          <ul class="colophon mono" data-fade>
+            <li><span>Medium</span><span>Graphite, 2B–6B</span></li>
+            <li><span>Render</span><span>WebGL · single pass</span></li>
+            <li><span>Colour</span><span>None, until you move</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- V ——————————————————————————————————————————— CLOSE -->
+  <section class="act act--5" id="act-5" data-act="5" aria-labelledby="act-5-title">
+    <div class="act__pin">
+      <div class="close">
+        <p class="act__index mono plate" data-fade>V / Close</p>
+        <h2 class="display display--lg plate" id="act-5-title">
+          <span class="line"><span class="line__in">Again.</span></span>
+          <span class="line"><span class="line__in">And again.</span></span>
+        </h2>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="chrome chrome--bottom" id="colophon">
+  <div class="chrome__row">
+    <p class="mono">Carousel — a study in return</p>
+    <ul class="chrome__meta mono">
+      <li><a href="#act-1">Top</a></li>
+      <li><a href="#act-4">Text</a></li>
+      <li>2026</li>
+    </ul>
+  </div>
+</footer>
+
+<noscript>
+  <div class="noscript">
+    <p>This page renders its film through WebGL and needs JavaScript. The text of all five
+    acts is present above, and the source drawing is a graphite carousel on white paper.</p>
+  </div>
+</noscript>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
