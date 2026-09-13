@@ -2,11 +2,13 @@ import './styles/main.css';
 
 import Scene from './gl/Scene.js';
 import VideoPlane from './gl/VideoPlane.js';
+import ImagePlane from './gl/ImagePlane.js';
 import createPreloader from './ui/preloader.js';
 import createScroll, { gsap, ScrollTrigger } from './animation/scroll.js';
 import { buildIntro, buildActs, watchScrollCue } from './animation/timelines.js';
 
 const VIDEO_SRC = `${import.meta.env.BASE_URL}carousel.mp4`;
+const SHOP_SRC = `${import.meta.env.BASE_URL}shop.jpg`;
 const MOBILE_BREAKPOINT = 768;
 
 const prefersReduced = () =>
@@ -113,20 +115,31 @@ async function boot() {
   const plane = new VideoPlane({ src: VIDEO_SRC, reduced, mobile });
   scene.add(plane);
 
+  const imagePlane = new ImagePlane({ src: SHOP_SRC, mobile });
+  scene.add(imagePlane);
+  imagePlane.follow(document.getElementById('ring-frame'));
+
   canvas.setAttribute('aria-hidden', 'true');
   canvas.setAttribute('role', 'presentation');
 
   // Dev-only handle for driving the film by hand (frame grabs, scrub checks).
   // The DEV guard strips it from production builds.
-  if (import.meta.env.DEV) window.__carousel = { scene, plane, gsap, ScrollTrigger };
+  if (import.meta.env.DEV) window.__carousel = { scene, plane, imagePlane, gsap, ScrollTrigger };
 
   const teardown = [];
+
+  /* The booth is a tenth the size of the film, so it rides along on the film's
+     progress rather than competing for the bar. It is also non-fatal: if it
+     never arrives the <img> fallback in that section simply stays visible. */
+  const shopReady = imagePlane.load()
+    .then(() => { document.documentElement.classList.add('gl-ready'); })
+    .catch((err) => { console.warn('[carousel] booth image unavailable:', err.message); });
 
   try {
     await plane.load((p) => preloader.setProgress(p));
   } catch (err) {
     preloader.fail(
-      'The film could not be loaded. The five acts are written out below and remain readable.'
+      'The film could not be loaded. All eight sections are written out below and remain readable.'
     );
     document.body.classList.remove('is-loading');
     console.error(err);
@@ -137,6 +150,8 @@ async function boot() {
   // header starts it. Everywhere else it plays.
   if (!reduced) plane.play();
   await firstFrame(plane.video);
+
+  await shopReady;
 
   // A frame exists in the back buffer before the loader is allowed to lift.
   scene.renderOnce(0, 0);
@@ -155,7 +170,7 @@ async function boot() {
   gsap.ticker.add(tick);
   teardown.push(() => gsap.ticker.remove(tick));
 
-  teardown.push(buildActs({ plane, reduced, mobile }));
+  teardown.push(buildActs({ plane, imagePlane, reduced, mobile }));
 
   // The loader unhides the page as it starts fading, so the intro plays under
   // it rather than after it — one continuous hand-off, not two beats.

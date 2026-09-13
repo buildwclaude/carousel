@@ -173,10 +173,71 @@ function buildReduced({ plane }) {
   });
 }
 
+/* --------------------------------------------------- reading sections ---- */
+
+/**
+ * The long-form sections are not pinned and not scrubbed. They are what the
+ * scroll is actually for, so they move at reading speed and simply settle in.
+ */
+function buildReadingSections({ imagePlane, reduced }) {
+  q(document, '.read').forEach((section) => {
+    const items = q(section, '[data-fade]');
+    if (!items.length) return;
+    gsap.set(items, { autoAlpha: 0, y: reduced ? 0 : 18 });
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top 78%',
+      once: true,
+      onEnter: () => gsap.to(items, {
+        autoAlpha: 1, y: 0,
+        duration: reduced ? 0.6 : 1.0,
+        stagger: 0.07,
+        ease: E_SETTLE,
+      }),
+    });
+  });
+
+  if (!imagePlane) return;
+
+  const ring = document.querySelector('.read--ring');
+  const frame = document.getElementById('ring-frame');
+  if (!ring || !frame) return;
+
+  /* Drawn only while its section is on screen — the glow shader's extra taps
+     are never paid for anywhere else. */
+  ScrollTrigger.create({
+    trigger: ring,
+    start: 'top 92%',
+    end: 'bottom 8%',
+    onToggle: (self) => { imagePlane.opacity = self.isActive ? 1 : 0; },
+  });
+
+  if (reduced) {
+    imagePlane.uniforms.uReveal.value = 1.4;   // fully clear of the wipe ramp
+    return;
+  }
+
+  // the booth wipes upward into view as the section arrives
+  gsap.fromTo(imagePlane.uniforms.uReveal,
+    { value: 0 },
+    {
+      value: 1.4,
+      ease: 'none',
+      immediateRender: false,
+      scrollTrigger: {
+        trigger: frame,
+        start: 'top 92%',
+        end: 'top 38%',
+        scrub: 0.9,
+      },
+    });
+}
+
 /* ------------------------------------------------------------- the 5 acts */
 
 /** Returns a teardown for the listeners it registers outside the trigger set. */
-export function buildActs({ plane, reduced = false, mobile = false }) {
+export function buildActs({ plane, imagePlane, reduced = false, mobile = false }) {
+  buildReadingSections({ imagePlane, reduced });
   if (reduced) { buildReduced({ plane }); return () => {}; }
 
   const u = plane.uniforms;
@@ -206,6 +267,13 @@ export function buildActs({ plane, reduced = false, mobile = false }) {
       scrub: 0.85,
       invalidateOnRefresh: true,
       anticipatePin: 1,
+      /* Pins add spacing, which moves everything below them down. The reading
+         sections are created before these, so without an explicit priority
+         they measure against a pre-pin layout and land thousands of pixels
+         off — the booth's section would then be "past" before you reach it,
+         and it would never draw. Higher refreshes first; descending by
+         document order keeps the pins themselves in sequence. */
+      refreshPriority: 10 - n,
       ...extra,
     },
     defaults: ACT_DEFAULTS,
@@ -220,7 +288,7 @@ export function buildActs({ plane, reduced = false, mobile = false }) {
   /* --- I. Cold open, handing over to II --------------------------------- */
   {
     const s = act(1);
-    const tl = keep(gsap.timeline(pinned(1, '+=110%')));
+    const tl = keep(gsap.timeline(pinned(1, '+=80%')));
 
     tl.fromTo(u.uZoom, ...uni(STATE[1].zoom, STATE[2].zoom), 0)
       .fromTo(u.uFocus, ...uni(STATE[1].focus, STATE[2].focus), 0)
@@ -241,7 +309,7 @@ export function buildActs({ plane, reduced = false, mobile = false }) {
 
     gsap.set([...index, ...specs, ...caption], { autoAlpha: 0, y: 16 });
 
-    const tl = keep(gsap.timeline(pinned(2, '+=130%')));
+    const tl = keep(gsap.timeline(pinned(2, '+=90%')));
 
     tl.to([...index, ...specs],
         { autoAlpha: 1, y: 0, duration: 0.22, stagger: 0.04, ease: 'power2.out' }, 0.02)
@@ -263,7 +331,7 @@ export function buildActs({ plane, reduced = false, mobile = false }) {
     gsap.set(lines, { yPercent: 108 });
     gsap.set(fades, { autoAlpha: 0, y: 16 });
 
-    const tl = keep(gsap.timeline(pinned(3, mobile ? '+=150%' : '+=210%')));
+    const tl = keep(gsap.timeline(pinned(3, mobile ? '+=120%' : '+=160%')));
 
     tl.to(lines, { yPercent: 0, duration: 0.2, stagger: 0.05, ease: E_SETTLE }, 0)
       .to(fades, { autoAlpha: 1, y: 0, duration: 0.18, stagger: 0.04, ease: 'power2.out' }, 0.1);
@@ -312,7 +380,7 @@ export function buildActs({ plane, reduced = false, mobile = false }) {
        bleed in the timeline, so asserting it here costs no visible snap. */
     const releaseBox = () => plane.setFullBleed();
 
-    const tl = keep(gsap.timeline(pinned(4, '+=170%', {
+    const tl = keep(gsap.timeline(pinned(4, '+=130%', {
       onLeave: releaseBox,
       onLeaveBack: releaseBox,
     })));
@@ -338,7 +406,7 @@ export function buildActs({ plane, reduced = false, mobile = false }) {
     gsap.set(lines, { yPercent: 108 });
     gsap.set(fades, { autoAlpha: 0, y: 14 });
 
-    const tl = keep(gsap.timeline(pinned(5, '+=130%')));
+    const tl = keep(gsap.timeline(pinned(5, '+=70%')));
 
     tl.fromTo(u.uDarken, ...uni(STATE[4].darken, STATE[5].darken), 0)
       .fromTo(u.uZoom, ...uni(STATE[4].zoom, STATE[5].zoom), 0)

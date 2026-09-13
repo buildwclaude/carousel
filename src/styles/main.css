@@ -313,6 +313,11 @@ main { position: relative; z-index: 10; }
   width: fit-content;
   max-width: 100%;
 }
+
+/* Containers that hold a whole column of prose keep their own width. */
+.read__body.plate,
+.note.plate,
+.pull.plate { width: auto; }
 .plate::before {
   content: "";
   position: absolute;
@@ -332,6 +337,11 @@ main { position: relative; z-index: 10; }
 .specs__item dt,
 .specs__item dd,
 .prose p,
+.pull p,
+.note__title,
+.note p,
+.note__num,
+.ring__figure figcaption,
 .colophon li,
 .scroll-cue,
 .chrome__row {
@@ -518,6 +528,141 @@ main { position: relative; z-index: 10; }
 .close { width: 100%; padding-left: clamp(0rem, 6vw, 8rem); }
 .close .act__index { margin-bottom: 1.6rem; }
 
+
+
+/* =========================================================================
+   Reading sections — long-form copy scrolling over the film.
+   Not pinned: these are what the scroll is actually *for*, so they move at
+   reading speed while the film holds behind them.
+   ========================================================================= */
+
+.read {
+  position: relative;
+  padding: clamp(6rem, 16vh, 12rem) var(--gut);
+}
+
+.read__inner {
+  max-width: 78rem;
+  margin: 0 auto;
+}
+
+/* asymmetric: the column sits left of centre, never centred in the page */
+.read__body {
+  max-width: 46ch;
+  margin-left: clamp(0rem, 8vw, 10rem);
+}
+
+.read__body .act__index { margin-bottom: 1.2rem; }
+.read__body .display--sm { margin-bottom: 1.8rem; }
+
+.read .prose p:last-child { margin-bottom: 0; }
+.prose em { font-style: italic; color: var(--paper); }
+
+/* --- pull quote --------------------------------------------------------- */
+
+.pull {
+  margin: clamp(3.5rem, 8vh, 6rem) 0 0 auto;
+  max-width: 30ch;
+  padding: 0;
+  border: 0;
+  text-align: right;
+}
+.pull p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.1vw, 2rem);
+  font-style: italic;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+}
+
+/* --- V. the ring: image beside the copy --------------------------------- */
+
+.ring__split {
+  max-width: 78rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: center;
+}
+.read--ring .read__body { margin-left: 0; }
+
+.ring__figure { margin: 0; position: relative; }
+
+/* The box the GL image plane is drawn into. The <img> underneath is the
+   no-WebGL fallback and the thing screen readers and search engines see. */
+.ring__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--hairline);
+}
+.ring__fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* inverted in CSS so the fallback matches the shader's treatment, and
+     screened so its blank paper drops out the way the shader's matte does */
+  filter: invert(1) contrast(1.15) brightness(0.92);
+  mix-blend-mode: screen;
+  /* visible by default — progressive enhancement. The GL plane hides it only
+     once it has actually loaded and can take over. */
+  opacity: 1;
+  transition: opacity 0.6s var(--ease-settle);
+}
+.gl-ready .ring__fallback { opacity: 0; }
+
+.ring__figure figcaption {
+  margin-top: 1rem;
+  color: var(--mute);
+}
+
+/* --- VII. field notes --------------------------------------------------- */
+
+.notes__head {
+  max-width: 46ch;
+  margin-left: clamp(0rem, 8vw, 10rem);
+  margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+}
+.notes__head .act__index { margin-bottom: 1.2rem; }
+
+.notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+.note {
+  padding: 1.75rem 1.5rem 1.6rem;
+  border-top: 1px solid var(--hairline);
+}
+.note__num {
+  display: block;
+  color: var(--bone);
+  margin-bottom: 1.1rem;
+}
+.note__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.5vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.85rem;
+}
+.note p {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 0.84vw, 0.8rem);
+  line-height: 1.8;
+  color: rgba(244, 241, 236, 0.72);
+}
+
 /* =========================================================================
    Preloader
    ========================================================================= */
@@ -603,6 +748,11 @@ main { position: relative; z-index: 10; }
   .display--md { font-size: clamp(2.1rem, 11vw, 4rem); }
 
   .split { grid-template-columns: 1fr; gap: 2.25rem; }
+  .ring__split { grid-template-columns: 1fr; gap: 2.25rem; }
+  .read { padding: clamp(4rem, 10vh, 6rem) var(--gut); }
+  .read__body, .notes__head { margin-left: 0; }
+  .pull { margin-left: 0; text-align: left; max-width: 100%; }
+  .notes { grid-template-columns: 1fr; }
   .split__frame { aspect-ratio: 1 / 1; max-height: 46vh; }
   .close { padding-left: 0; }
 

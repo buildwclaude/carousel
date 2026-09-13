@@ -1,7 +1,7 @@
 # Carousel — a study in return
 
-A single ten-second graphite drawing, rendered as a WebGL shader and scrolled
-through five pinned acts.
+Two graphite drawings — a carousel and a ring-toss booth — rendered as WebGL
+shaders and scrolled through eight sections.
 
 ```bash
 npm install
@@ -10,13 +10,23 @@ npm run dev
 
 ## The one decision everything else follows from
 
-The source (`public/carousel.mp4`, 1280×720, 24fps, 7.4s, stereo audio at
-−21.5 LUFS) is a pen-and-graphite carousel on white paper, and it is
-**completely achromatic** — measured median saturation 0.000, maximum 0.022.
+Both sources — `public/carousel.mp4` (1280×720, 24fps, 6.875s, stereo audio)
+and `public/shop.jpg` — are pen-and-graphite drawings on white paper, and both
+are **completely achromatic**: measured median saturation 0.000, maximum 0.023.
 
-The loop is near-seamless rather than seamless: the carousel has rotated
-slightly between the first and last frame, so there is a small step at the
-wrap. It is measurably smaller than the previous cut of the video.
+### The loop is built, not found
+
+The delivered video had two defects that read as a stall every time it wrapped:
+frames 0 and 1 were **identical** (an 83ms freeze at every loop start), and the
+first and last frames didn't match (frame difference 437 against a typical
+frame-to-frame motion of 27), so the wrap read as a restart. There is no
+natural loop point — the carousel never completes a rotation in 7.4s.
+
+`public/carousel.mp4` is therefore a rebuild: duplicate frame dropped, video
+and audio trimmed to exactly equal length, and the tail crossfaded into the
+head over 0.5s. The seam is now **30** against a typical 27 — indistinguishable
+from any other frame transition. The cost is soft ghosting during the half
+second of dissolve, which reads as a double exposure.
 
 So the fragment shader **inverts it**: paper becomes the ground, graphite
 becomes the light, and the drawing's sparkle marks become actual points of
@@ -37,8 +47,10 @@ src/
   gl/
     Scene.js                renderer, ortho camera, loop, resize, pause
     VideoPlane.js           geometry, ShaderMaterial, damped inputs
+    ImagePlane.js           the booth: DOM-following plane, glow shader
     shaders/video.vert
     shaders/video.frag      the entire film
+    shaders/image.frag      inversion + twinkle + bloom for the booth
   animation/
     scroll.js               Lenis <-> ScrollTrigger <-> GSAP ticker
     timelines.js            the five acts
@@ -80,6 +92,37 @@ Each act is a pinned `ScrollTrigger` with a scrubbed timeline on a normalised
 refresh sweeps all of them, a `refresh` listener re-renders whichever act
 actually owns the current scroll position, last.
 
+### Sections
+
+Five **pinned** effect acts carry the film; three **unpinned** reading sections
+carry the argument and move at reading speed. The reading sections are what the
+scroll is for — the pinned acts were doing all the work before, which meant
+long stretches of scrolling past an effect with nothing to read.
+
+| # | Section | Kind |
+|---|---|---|
+| I | Cold open — "Round and round" | pinned · `optical-fringe` |
+| II | The reveal | pinned · `tonal-negative` |
+| III | Origins | reading |
+| IV | Fragment | pinned · `spatial-tiles` |
+| V | The ring — booth image | reading + `ImagePlane` |
+| VI | Framed | pinned · `layout-framed` |
+| VII | Field notes | reading |
+| VIII | Close | pinned |
+
+### The booth
+
+`ImagePlane` is a second GL plane that follows `#ring-frame` by
+`getBoundingClientRect` every frame it is visible — its section is not pinned,
+so there is no box to tween and nothing that can desync. It is `mesh.visible =
+false` outside its section, so the glow shader's extra taps are only ever paid
+for on screen. Underneath it sits a real `<img>`, visible by default and hidden
+only once the texture has actually loaded.
+
+The glow is two effects: a **high-pass twinkle** (each sparkle pulses on its
+own hashed phase, so they glint out of step) and a **thresholded bloom** that
+breathes. Both achromatic — the page's only colour is still the split.
+
 ### The plane is full bleed everywhere except act IV
 
 Act IV is the **only** act allowed to move the plane off full bleed. That
@@ -101,7 +144,7 @@ frame, because no other act owns the box and nothing puts it back.
 | Sound | Starts muted, because muted is the only way a browser will autoplay. The header control is opt-in — the click that enables it is the gesture that makes unmuting legal. Enabling sound on a stopped film starts it, since silent "sound on" reads as broken. |
 | Playback state | The controls track **intent**, not the element's `paused` flag. Hiding the tab stops the element (so audio doesn't play on into a tab nobody is looking at) without flipping the labels. |
 | `prefers-reduced-motion` | No Lenis, no pins, no scrubbing; distortion is compiled out of the shader with a `REDUCED` define and the grain stops moving. The film starts on a still frame and the header offers Play. Every act stays readable. |
-| Mobile (<768px) | The tile grid and the focus blur are compiled out (`MOBILE`), grain is reduced. |
+| Mobile (<768px) | The tile grid and the focus blur are compiled out (`MOBILE`), grain is reduced, and the booth's glow rings drop from 6 taps to 4. |
 | Narrow viewports | Cover crops a 16:9 source past usefulness on a phone, so the fit eases toward contain — driven by how severe the crop is, not by a breakpoint. No bars appear, because out-of-frame is masked to the page's own black. |
 | Contrast | Measured against the brightest rendered frames rather than assumed: grounding gradient, local blurred plates, and a text halo. Worst *single pixel* under every block clears AA, and all but the cold-open headline clear AAA. |
 | Performance | DPR capped at 2; render loop stops on `visibilitychange` and when the canvas leaves the viewport via IntersectionObserver. |
