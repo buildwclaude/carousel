@@ -317,7 +317,9 @@ main { position: relative; z-index: 10; }
 /* Containers that hold a whole column of prose keep their own width. */
 .read__body.plate,
 .note.plate,
-.pull.plate { width: auto; }
+.pull.plate,
+.option__media.plate,
+.option figcaption.plate { width: auto; }
 .plate::before {
   content: "";
   position: absolute;
@@ -341,7 +343,7 @@ main { position: relative; z-index: 10; }
 .note__title,
 .note p,
 .note__num,
-.ring__figure figcaption,
+.option figcaption,
 .colophon li,
 .scroll-cue,
 .chrome__row {
@@ -577,47 +579,35 @@ main { position: relative; z-index: 10; }
   color: var(--paper);
 }
 
-/* --- V. the ring: image beside the copy --------------------------------- */
+/* --- V. the ring: two treatments, same plate ----------------------------- */
 
-.ring__split {
-  max-width: 78rem;
-  margin: 0 auto;
+.compare {
+  margin-top: clamp(3rem, 7vh, 5rem);
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr);
-  gap: clamp(2rem, 6vw, 6rem);
-  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
 }
-.read--ring .read__body { margin-left: 0; }
 
-.ring__figure { margin: 0; position: relative; }
+.option { margin: 0; }
 
-/* The box the GL image plane is drawn into. The <img> underneath is the
-   no-WebGL fallback and the thing screen readers and search engines see. */
-.ring__frame {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  border: 1px solid var(--hairline);
-}
-.ring__fallback {
-  position: absolute;
-  inset: 0;
+/* .plate carries the dark blurred pool — the same one behind the copy, same
+   tokens, same blur. Nothing here overrides it. */
+.option__media img {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* inverted in CSS so the fallback matches the shader's treatment, and
-     screened so its blank paper drops out the way the shader's matte does */
-  filter: invert(1) contrast(1.15) brightness(0.92);
-  mix-blend-mode: screen;
-  /* visible by default — progressive enhancement. The GL plane hides it only
-     once it has actually loaded and can take over. */
-  opacity: 1;
-  transition: opacity 0.6s var(--ease-settle);
+  height: auto;
 }
-.gl-ready .ring__fallback { opacity: 0; }
 
-.ring__figure figcaption {
-  margin-top: 1rem;
+.option figcaption {
+  margin-top: clamp(1.5rem, 3vh, 2.25rem);
   color: var(--mute);
+  line-height: 1.6;
+}
+.option__tag {
+  display: block;
+  color: var(--bone);
+  margin-bottom: 0.45rem;
 }
 
 /* --- VII. field notes --------------------------------------------------- */
@@ -748,7 +738,7 @@ main { position: relative; z-index: 10; }
   .display--md { font-size: clamp(2.1rem, 11vw, 4rem); }
 
   .split { grid-template-columns: 1fr; gap: 2.25rem; }
-  .ring__split { grid-template-columns: 1fr; gap: 2.25rem; }
+  .compare { grid-template-columns: 1fr; gap: 3.5rem; }
   .read { padding: clamp(4rem, 10vh, 6rem) var(--gut); }
   .read__body, .notes__head { margin-left: 0; }
   .pull { margin-left: 0; text-align: left; max-width: 100%; }

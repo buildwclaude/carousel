@@ -156,7 +156,7 @@
 
   <!-- V ———————————————————————————————————————————— THE RING -->
   <section class="read read--ring" id="ring" aria-labelledby="ring-title">
-    <div class="ring__split">
+    <div class="read__inner">
       <div class="read__body plate">
         <p class="act__index mono" data-fade>V / The ring</p>
         <h2 class="display display--sm" id="ring-title" data-fade>Win a prize</h2>
@@ -179,12 +179,33 @@
         </div>
       </div>
 
-      <figure class="ring__figure">
-        <!-- the GL image plane is animated into this box -->
-        <div class="ring__frame" id="ring-frame" aria-hidden="true"></div>
-        <img class="ring__fallback" id="ring-fallback" src="/shop.jpg" alt="A hand-drawn fairground booth with a sign reading Ring Toss — Win a Prize: a striped canopy, bunting, shelves of prizes and stacked bottles." />
-        <figcaption class="mono plate" data-fade>Fig. 02 — Ring toss booth, graphite on paper</figcaption>
-      </figure>
+      <!-- Two treatments of the same drawing, both on the same dark plate that
+           sits behind the copy. Pick one and the other comes out. -->
+      <div class="compare" data-fade>
+        <figure class="option">
+          <div class="option__media plate">
+            <img src="/shop_transparent.png"
+                 alt="A hand-drawn fairground booth with a sign reading Ring Toss — Win a Prize: a striped canopy, bunting, shelves of prizes and stacked bottles. White line work on a transparent ground."
+                 width="1600" height="872" loading="lazy" decoding="async" />
+          </div>
+          <figcaption class="mono plate">
+            <span class="option__tag">Option A</span>
+            shop_transparent.png — paper removed, line work only
+          </figcaption>
+        </figure>
+
+        <figure class="option">
+          <div class="option__media plate">
+            <img src="/shop.jpg"
+                 alt="The same hand-drawn ring toss booth, shown as the original graphite drawing on white paper."
+                 width="1600" height="872" loading="lazy" decoding="async" />
+          </div>
+          <figcaption class="mono plate">
+            <span class="option__tag">Option B</span>
+            shop.jpg — original, untouched
+          </figcaption>
+        </figure>
+      </div>
     </div>
   </section>
 

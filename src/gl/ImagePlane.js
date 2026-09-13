@@ -6,6 +6,11 @@ const damp = (current, target, lambda, delta) =>
   current + (target - current) * (1 - Math.exp(-lambda * delta));
 
 /**
+ * DORMANT. The booth is currently presented as two plain <img> options in
+ * section V so its treatment can be chosen; nothing imports this yet. Kept
+ * because the twinkle/bloom shader in image.frag is the natural thing to put
+ * back on whichever option wins.
+ *
  * The ring-toss drawing, drawn into a box measured off a DOM element.
  *
  * Unlike the film's plane this one has no scroll choreography to tween its

@@ -179,7 +179,7 @@ function buildReduced({ plane }) {
  * The long-form sections are not pinned and not scrubbed. They are what the
  * scroll is actually for, so they move at reading speed and simply settle in.
  */
-function buildReadingSections({ imagePlane, reduced }) {
+function buildReadingSections({ reduced }) {
   q(document, '.read').forEach((section) => {
     const items = q(section, '[data-fade]');
     if (!items.length) return;
@@ -196,48 +196,13 @@ function buildReadingSections({ imagePlane, reduced }) {
       }),
     });
   });
-
-  if (!imagePlane) return;
-
-  const ring = document.querySelector('.read--ring');
-  const frame = document.getElementById('ring-frame');
-  if (!ring || !frame) return;
-
-  /* Drawn only while its section is on screen — the glow shader's extra taps
-     are never paid for anywhere else. */
-  ScrollTrigger.create({
-    trigger: ring,
-    start: 'top 92%',
-    end: 'bottom 8%',
-    onToggle: (self) => { imagePlane.opacity = self.isActive ? 1 : 0; },
-  });
-
-  if (reduced) {
-    imagePlane.uniforms.uReveal.value = 1.4;   // fully clear of the wipe ramp
-    return;
-  }
-
-  // the booth wipes upward into view as the section arrives
-  gsap.fromTo(imagePlane.uniforms.uReveal,
-    { value: 0 },
-    {
-      value: 1.4,
-      ease: 'none',
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: frame,
-        start: 'top 92%',
-        end: 'top 38%',
-        scrub: 0.9,
-      },
-    });
 }
 
 /* ------------------------------------------------------------- the 5 acts */
 
 /** Returns a teardown for the listeners it registers outside the trigger set. */
-export function buildActs({ plane, imagePlane, reduced = false, mobile = false }) {
-  buildReadingSections({ imagePlane, reduced });
+export function buildActs({ plane, reduced = false, mobile = false }) {
+  buildReadingSections({ reduced });
   if (reduced) { buildReduced({ plane }); return () => {}; }
 
   const u = plane.uniforms;
