@@ -599,9 +599,23 @@ main { position: relative; z-index: 10; }
   height: auto;
 }
 
+/* Option A gets the same dark pool as the copy, but shaped to the artwork
+   rather than to its bounding box. A .plate behind a large image exposes its
+   whole rectangle — behind text the glyphs hide most of it, which is why it
+   reads as a glow there and as a box here. drop-shadow works off the alpha
+   channel, so the pool follows the booth's silhouette and the film fades out
+   around it instead of stopping at an edge. Same colour token as the plate. */
+.option__media--cutout img {
+  filter:
+    drop-shadow(0 0 16px rgba(10, 10, 11, 0.95))
+    drop-shadow(0 0 40px rgba(10, 10, 11, 0.9))
+    drop-shadow(0 0 80px rgba(10, 10, 11, 0.75));
+}
+
 /* Option B keeps the whole frame — no cutout — and takes the site's
    tonal-negative instead, so paper becomes ground and graphite becomes light,
-   exactly as the film is treated in the shader. */
+   exactly as the film is treated in the shader. Its rectangle is inherent, so
+   it keeps the plate. */
 .option__img--negative {
   filter: invert(1) contrast(1.14) brightness(0.94);
 }
